@@ -3,18 +3,6 @@
 from argparse import ArgumentParser
 from itertools import product
 
-def kmer(sequence, n= 2):
-
-    iterator= iter(sequence)
-    slice= tuple(islice(iterator, n))
-
-    if len(slice) == n:
-        yield slice
-
-    for elem in iterator:
-        slice= slice[1:] + (elem, )
-        yield slice
-
 
 def brute_force(sequences, k):
 
@@ -26,7 +14,7 @@ def brute_force(sequences, k):
                 break 
 
         else: # for/else.. if for loop not broken
-            print offset, sequences[0][offset[0]:offset[0]+k]
+            return (offset, sequences[0][offset[0]:offset[0]+k])
 
 
 if __name__ == '__main__':
@@ -43,4 +31,9 @@ if __name__ == '__main__':
     sequences= fh.readlines()
     fh.close()
     
-    brute_force(sequences[args.start:args.end], args.k)
+    found= brute_force(sequences[args.start:args.end], args.k)
+    if found:
+        (offset, pattern)= found
+        print "Found motif %s at offset %s" % (pattern, offset)
+    else:
+        print "Could not find any motifs"
