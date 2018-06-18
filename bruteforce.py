@@ -5,15 +5,18 @@ from itertools import product
 
 
 def brute_force(sequences, k):
-
+    
     for offset in product( range(len(sequences[0])-k+1), repeat= len(sequences) ):  
+
+        notfound= False
 
         for i in range(1, len(offset)):
 
-            if sequences[0][offset[0]:offset[0]+k] != sequences[i][offset[i]:offset[i]+k]:
+            if sequences[0][offset[0]:offset[0]+k] != sequences[i][offset[i]:offset[i]+k]:  
+                notfound= True
                 break 
 
-        else: # for/else.. if for loop not broken
+        if not notfound:
             return (offset, sequences[0][offset[0]:offset[0]+k])
 
 
