@@ -5,18 +5,30 @@ from itertools import product
 
 
 def brute_force(sequences, k):
-    
-    for offset in product( range(len(sequences[0])-k+1), repeat= len(sequences) ):  
+
+
+    # cycle through the list of all possible permutations
+    # of possible offsets of length k across all the sequences
+
+    for offset in product( range(len(sequences[0])-k), repeat= len(sequences) ):  
+        
 
         notfound= False
-
         for i in range(1, len(offset)):
+
+            # if the k-mer of length k from the first sequence
+            # doesn't match the k-mer of length k from the next sequence
+            # then we didn't find a motify match between the two sequences
 
             if sequences[0][offset[0]:offset[0]+k] != sequences[i][offset[i]:offset[i]+k]:  
                 notfound= True
                 break 
 
+        # if we did find a match between two k-mer's across any of the sequences
+        # then return the offset and the k-mer we found
+
         if not notfound:
+
             return (offset, sequences[0][offset[0]:offset[0]+k])
 
 
@@ -33,7 +45,10 @@ if __name__ == '__main__':
     fh= open(args.input, "r")
     sequences= fh.readlines()
     fh.close()
-    
+
+    # search time will grow expodentially so limit 
+    # the sequences we're considering via start:end slice
+
     found= brute_force(sequences[args.start:args.end], args.k)
     if found:
         (offset, pattern)= found
