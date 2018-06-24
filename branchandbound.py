@@ -42,15 +42,17 @@ class MotifSearch(object):
     
             # optimisticScore <-- Score(s, i, DNA) + (t - i) * l
             opt_score= self.score(path, sequences) + (l - depth) * self.k if depth > 1 else self.k * l
-    
+   
+            # if the optimistic score is worst than the best score
+            # then we can prune this branch and keep the best score 
             if (opt_score < best):
                 pruned= pruned + 1
                 return best
 
             else:
-
+                   
                 for kmer in range(len(sequences[depth]) - (self.k + 1)):
-                    next= tuple([i for i in path] + [kmer])
+                    next= [i for i in path] + [kmer]
                     best= self.next_vertex(sequences, next, best, pruned)
     
                 return best
