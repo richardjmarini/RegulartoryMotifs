@@ -10,7 +10,7 @@ class MotifSearch(object):
 
     def __init__(self, k):
 
-        self.alignments= []
+        self.offset= []
         self.k= k
 
     def score(self, kmer, sequences):
@@ -49,7 +49,7 @@ class MotifSearch(object):
             # otherwise, the best score still stands
 
             if (current > best):
-                self.alignments= path
+                self.offset= path
                 return current
             else:
                 return best
@@ -75,7 +75,7 @@ class MotifSearch(object):
     
                 return best
     
-    def branch_and_bound(self, sequences):
+    def search(self, sequences):
     
         pruned= 0
         best= 0
@@ -85,11 +85,11 @@ class MotifSearch(object):
         for kmer in range(len(sequences[0]) - (self.k + 1)):
             best= self.next_vertex(sequences, [kmer], best, pruned)
     
-        return self.alignments
+        return self.offset
 
     def __call__(self, sequences):
 
-        return self.branch_and_bound(sequences)
+        return self.search(sequences)
 
 
 if __name__ == '__main__':
