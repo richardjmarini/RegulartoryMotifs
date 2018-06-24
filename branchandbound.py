@@ -33,7 +33,7 @@ class MotifSearch(object):
 
         return consensus_score                 
 
-    def next_vertex(self, sequences, path, best, pruned):
+    def next_vertex(self, sequences, path, best, skip):
     
         depth= len(path)
         l= len(sequences)
@@ -60,30 +60,31 @@ class MotifSearch(object):
             # optimisticScore <-- Score(s, i, DNA) + (t - i) * l 
             opt_score= self.score(path, sequences) + (l - depth) * self.k if depth > 1 else self.k * l
    
-            # page: 108
+            # page: 108 + bottom of page 107
             # if the optimistic score is worst than the best score
             # then we can prune this branch and keep the best score 
+            # BYPASS 
             if (opt_score < best):
-                pruned= pruned + 1
+                skip= skip + 1
                 return best
 
             else:
                    
                 # for each starting positoin of the kmer 
                 for kmer in range(len(sequences[depth]) - (self.k + 1)):
-                    best= self.next_vertex(sequences, path + [kmer], best, pruned)
+                    best= self.next_vertex(sequences, path + [kmer], best, skip)
     
                 return best
     
     def search(self, sequences):
     
-        pruned= 0
+        skip= 0
         best= 0
  
         #: page 109
         # cycle through each k-mer starting position 
         for kmer in range(len(sequences[0]) - (self.k + 1)):
-            best= self.next_vertex(sequences, [kmer], best, pruned)
+            best= self.next_vertex(sequences, [kmer], best, skip)
     
         return self.offset
 
@@ -110,6 +111,8 @@ if __name__ == '__main__':
 
     # list the sequence, position and pattern of each motif we found
     for (sequence, position) in zip(range(args.start, args.end), search(sequences[args.start:args.end])):
+
          pattern= sequences[sequence][position:position + args.k]
+
          print "found motif", pattern, "at position", position, "in sequence", sequences[sequence]
 
