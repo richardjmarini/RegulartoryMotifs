@@ -4,6 +4,9 @@ from argparse import ArgumentParser
 from collections import Counter
 
 class MotifSearch(object):
+    """
+    Searches for motifs using branch and bound method.
+    """
 
     def __init__(self, k):
 
@@ -19,11 +22,16 @@ class MotifSearch(object):
     
         depth= len(path)
         l= len(sequences)
-    
+        
         if (depth == l):
     
             current= self.score(path, sequences)
     
+            # if the current score is best
+            # then save the path we took to get here
+            # and return the current score
+            # otherwise, the best score still stands
+
             if (current > best):
                 self.alignments= path
                 return current
@@ -32,13 +40,15 @@ class MotifSearch(object):
     
         else:
     
-            opt_score= self.k * (l-depth) + self.score(path, sequences) if depth > 1 else self.k * l
+            # optimisticScore <-- Score(s, i, DNA) + (t - i) * l
+            opt_score= self.score(path, sequences) + (l - depth) * self.k if depth > 1 else self.k * l
     
             if (opt_score < best):
                 pruned= pruned + 1
                 return best
+
             else:
-    
+
                 for kmer in range(len(sequences[depth]) - (self.k + 1)):
                     next= tuple([i for i in path] + [kmer])
                     best= self.next_vertex(sequences, next, best, pruned)
@@ -49,7 +59,8 @@ class MotifSearch(object):
     
         pruned= 0
         best= 0
-       
+ 
+        # cycle through each k-mer starting position 
         for kmer in range(len(sequences[0]) - (self.k + 1)):
             best= self.next_vertex(sequences, [kmer], best, pruned)
     
@@ -73,9 +84,11 @@ if __name__ == '__main__':
     fh= open(args.input, "r")
     sequences= [line.replace('\n', '').upper() for line in fh.readlines()]
     fh.close()
-
     
     search= MotifSearch(args.k)
+
+    # list the sequence, position and pattern of each motif we found
     for (sequence, position) in zip(range(args.start, args.end), search(sequences[args.start:args.end])):
-         print "found motif", sequences[sequence][position:position + args.k], "at position", position, "in sequence", sequences[sequence]
+         pattern= sequences[sequence][position:position + args.k]
+         print "found motif", pattern, "at position", position, "in sequence", sequences[sequence]
 
