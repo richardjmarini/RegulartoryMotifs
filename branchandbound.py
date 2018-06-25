@@ -10,7 +10,7 @@ class MotifSearch(object):
 
     def __init__(self, k):
 
-        self.offset= []
+        self.offsets= []
         self.k= k
 
     def score(self, kmer, sequences):
@@ -33,60 +33,60 @@ class MotifSearch(object):
 
         return consensus_score                 
 
-    def next_vertex(self, sequences, path, best, skip):
+    def next_vertex(self, sequences, offsets, max_score, skip):
     
-        depth= len(path)
-        l= len(sequences)
+        num_offsets= len(offsets)
+        num_sequences= len(sequences)
         
         # if we're at a leaf node
-        if (depth == l):
+        if (num_offsets == num_sequences):
     
-            current= self.score(path, sequences)
+            current_score= self.score(offsets, sequences)
     
-            # if the current score is best
+            # if the current_score is max_score
             # then save the path we took to get here
-            # and return the current score
-            # otherwise, the best score still stands
+            # and return the current_score
+            # otherwise, the max_score still stands
 
-            if (current > best):
-                self.offset= path
-                return current
+            if (current_score > max_score):
+                self.offsets= offsets
+                return current_score
             else:
-                return best
+                return max_score
     
         else:
     
             # page: 111
-            # optimisticScore <-- Score(s, i, DNA) + (t - i) * l 
-            opt_score= self.score(path, sequences) + (l - depth) * self.k if depth > 1 else self.k * l
+            # optimisticScore <-- Score(s, i, DNA) + (t - i) * l
+            opt_score= self.score(offsets, sequences) + (num_sequences - num_offsets) * self.k if num_offsets > 1 else self.k * num_sequences
    
             # page: 108 + bottom of page 107
-            # if the optimistic score is worst than the best score
-            # then we can prune this branch and keep the best score 
+            # if the optimistic score is worst than the max_score
+            # then we can prune this branch and keep the max_score 
             # BYPASS 
-            if (opt_score < best):
+            if (opt_score < max_score):
                 skip= skip + 1
-                return best
+                return max_score
 
             else:
                    
                 # for each starting positoin of the kmer 
-                for kmer in range(len(sequences[depth]) - (self.k + 1)):
-                    best= self.next_vertex(sequences, path + [kmer], best, skip)
+                for kmer in range(len(sequences[num_offsets]) - (self.k + 1)):
+                    max_score= self.next_vertex(sequences, offsets + [kmer], max_score, skip)
     
-                return best
+                return max_score
     
     def search(self, sequences):
     
         skip= 0
-        best= 0
+        max_score= 0
  
         #: page 109
         # cycle through each k-mer starting position 
         for kmer in range(len(sequences[0]) - (self.k + 1)):
-            best= self.next_vertex(sequences, [kmer], best, skip)
+            max_score= self.next_vertex(sequences, [kmer], max_score, skip)
     
-        return self.offset
+        return self.offsets
 
     def __call__(self, sequences):
 
