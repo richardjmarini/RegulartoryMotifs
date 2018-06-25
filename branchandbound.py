@@ -33,32 +33,17 @@ class MotifSearch(object):
 
         return consensus_score                 
 
-    def next_vertex(self, sequences, offsets, max_score, skip):
+    def next(self, sequences, offsets, max_score, skip):
     
         num_offsets= len(offsets)
         num_sequences= len(sequences)
         
-        # if we're at a leaf node
-        if (num_offsets == num_sequences):
-    
-            current_score= self.score(offsets, sequences)
-    
-            # if the current_score is max_score
-            # then save the path we took to get here
-            # and return the current_score
-            # otherwise, the max_score still stands
-
-            if (current_score > max_score):
-                self.offsets= offsets
-                return current_score
-            else:
-                return max_score
-    
-        else:
+        # if we're not yet at a leaf node 
+        if (num_offsets != num_sequences):
     
             # page: 111
             # optimisticScore <-- Score(s, i, DNA) + (t - i) * l
-            opt_score= self.score(offsets, sequences) + (num_sequences - num_offsets) * self.k if num_offsets > 1 else self.k * num_sequences
+            opt_score= self.score(offsets, sequences) + (num_sequences - num_offsets) * self.k if num_offsets > 1 else num_sequences * self.k
    
             # page: 108 + bottom of page 107
             # if the optimistic score is worst than the max_score
@@ -72,9 +57,26 @@ class MotifSearch(object):
                    
                 # for each starting positoin of the kmer 
                 for kmer in range(len(sequences[num_offsets]) - (self.k + 1)):
-                    max_score= self.next_vertex(sequences, offsets + [kmer], max_score, skip)
+                    max_score= self.next(sequences, offsets + [kmer], max_score, skip)
     
                 return max_score
+
+        else:
+
+            # if we finally reached a leaf node
+
+            current_score= self.score(offsets, sequences)
+    
+            # if the current_score is max_score
+            # then save the path we took to get here
+            # and return the current_score
+            # otherwise, the max_score still stands
+            if (current_score > max_score):
+                self.offsets= offsets
+                return current_score
+            else:
+                return max_score
+
     
     def search(self, sequences):
     
@@ -84,7 +86,7 @@ class MotifSearch(object):
         #: page 109
         # cycle through each k-mer starting position 
         for kmer in range(len(sequences[0]) - (self.k + 1)):
-            max_score= self.next_vertex(sequences, [kmer], max_score, skip)
+            max_score= self.next(sequences, [kmer], max_score, skip)
     
         return self.offsets
 
