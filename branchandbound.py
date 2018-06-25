@@ -49,7 +49,7 @@ class MotifSearch(object):
             # page: 108 + bottom of page 107
             if (opt_score >= max_score):
                    
-                # for each starting positoin of the k-mer 
+                # for each k-mer starting position
                 for kmer in range(len(sequences[num_offsets]) - (self.k + 1)):
                     max_score= self.next(sequences, offsets + [kmer], max_score)
     
