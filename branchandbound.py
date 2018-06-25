@@ -33,60 +33,50 @@ class MotifSearch(object):
 
         return consensus_score                 
 
-    def next(self, sequences, offsets, max_score, skip):
+    def next(self, sequences, offsets, max_score):
     
-        num_offsets= len(offsets)
         num_sequences= len(sequences)
-        
+        num_offsets= len(offsets)
+        score= max_score
+
         # if we're not yet at a leaf node 
         if (num_offsets != num_sequences):
     
             # page: 111
             # optimisticScore <-- Score(s, i, DNA) + (t - i) * l
-            opt_score= self.score(offsets, sequences) + (num_sequences - num_offsets) * self.k if num_offsets > 1 else num_sequences * self.k
+            opt_score= self.score(offsets, sequences) + (num_sequences - num_offsets) * self.k
    
             # page: 108 + bottom of page 107
-            # if the optimistic score is worst than the max_score
-            # then we can prune this branch and keep the max_score 
-            # BYPASS 
-            if (opt_score < max_score):
-                skip= skip + 1
-                return max_score
-
-            else:
+            if (opt_score >= max_score):
                    
                 # for each starting positoin of the kmer 
                 for kmer in range(len(sequences[num_offsets]) - (self.k + 1)):
-                    max_score= self.next(sequences, offsets + [kmer], max_score, skip)
+                    max_score= self.next(sequences, offsets + [kmer], max_score)
     
-                return max_score
+                score= max_score
 
         else:
 
             # if we finally reached a leaf node
+            # and the current_score is better than the max_score
+            # then save the offset and return the current score
+            # otherwise, the max_score still stands
 
             current_score= self.score(offsets, sequences)
-    
-            # if the current_score is max_score
-            # then save the path we took to get here
-            # and return the current_score
-            # otherwise, the max_score still stands
             if (current_score > max_score):
                 self.offsets= offsets
-                return current_score
-            else:
-                return max_score
+                score= current_score
 
+        return score
     
     def search(self, sequences):
     
-        skip= 0
         max_score= 0
  
         #: page 109
         # cycle through each k-mer starting position 
         for kmer in range(len(sequences[0]) - (self.k + 1)):
-            max_score= self.next(sequences, [kmer], max_score, skip)
+            max_score= self.next(sequences, [kmer], max_score)
     
         return self.offsets
 
