@@ -28,7 +28,7 @@ class MotifSearch(object):
             for x in range(len(kmer)):
                 y= kmer[x]
                 profile[sequences[x][y+i]]+= 1
-
+            
             consensus_score+= max(profile.values())
 
         return consensus_score                 
@@ -49,7 +49,7 @@ class MotifSearch(object):
             # page: 108 + bottom of page 107
             if (opt_score >= max_score):
                    
-                # for each starting positoin of the kmer 
+                # for each starting positoin of the k-mer 
                 for kmer in range(len(sequences[num_offsets]) - (self.k + 1)):
                     max_score= self.next(sequences, offsets + [kmer], max_score)
     
@@ -99,10 +99,10 @@ if __name__ == '__main__':
     sequences= [line.replace('\n', '').upper() for line in fh.readlines()]
     fh.close()
     
-    search= MotifSearch(args.k)
+    motif_search= MotifSearch(args.k)
 
     # list the sequence, position and pattern of each motif we found
-    for (sequence, position) in zip(range(args.start, args.end), search(sequences[args.start:args.end])):
+    for (sequence, position) in zip(range(args.start, args.end), motif_search(sequences[args.start:args.end])):
 
          pattern= sequences[sequence][position:position + args.k]
 
