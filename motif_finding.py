@@ -31,10 +31,10 @@ if __name__ == '__main__':
 
     elif args.optimization == 1:
 
-        search= MotifSearch(args.k)
+        motif_search= MotifSearch(args.k)
 
         # list the sequence, position and pattern of each motif we found
-        for (sequence, position) in zip(range(args.start, args.end), search(sequences[args.start:args.end])):
+        for (sequence, position) in zip(range(args.start, args.end), motif_search(sequences[args.start:args.end])):
              pattern= sequences[sequence][position:position + args.k]
              print "found motif", pattern, "at position", position, "in sequence", sequences[sequence]
 
