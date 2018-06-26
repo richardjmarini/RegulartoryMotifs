@@ -36,7 +36,7 @@ class MotifSearch(object):
                 profile[sequences[x][y+i]]+= 1
 
                 if self.debug:
-                    print "pos= %s, x= %s, y=%s, y+i=%s, sequence= %s value= %s" % (i, x, y, y+i, sequences[x], sequences[x][y+i])
+                    print "pos= %s, x= %s, y=%s, y+i=%s, sequence= %s alignment= %s" % (i, x, y, y+i, sequences[x], sequences[x][y+i])
 
             consensus_score+= max(profile.values())
             if self.debug:
