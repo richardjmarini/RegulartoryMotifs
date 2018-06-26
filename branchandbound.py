@@ -108,7 +108,7 @@ if __name__ == '__main__':
     parser.add_argument("--input", default= "implanted.txt", help= "file of sequences")
     parser.add_argument("--k", type= int, default= 8, help= "k-mer length")
     parser.add_argument("--start", type= int, default= 0, help= "starting sequence")
-    parser.add_argument("--end", type= int, default= 3, help= "ending sequence")
+    parser.add_argument("--end", type= int, default= 7, help= "ending sequence")
     parser.add_argument('--debug', dest= 'debug', action= 'store_true', default= False, help= "show debug trace")
 
 
