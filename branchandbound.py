@@ -21,8 +21,8 @@ class MotifSearch(object):
         """
   
         if self.debug:
-            print
-            profiles= []
+            print "\nkmer starting positions=", kmer
+            profile_matrix= []
 
         # compute the consensus score for each slice
         # of the motif matrix
@@ -36,15 +36,17 @@ class MotifSearch(object):
                 profile[sequences[x][y+i]]+= 1
 
                 if self.debug:
-                    print kmer, i, x, y, sequences[x], sequences[x][y+i]
+                    print "pos= %s, x= %s, y=%s, y+i=%s, sequence= %s value= %s" % (i, x, y, y+i, sequences[x], sequences[x][y+i])
 
             consensus_score+= max(profile.values())
             if self.debug:
-                profiles.append(profile)
+                profile_matrix.append(profile)
+                print 
 
         if self.debug:
-            pprint(profiles) 
-            print "=", consensus_score
+            print "profile matrix="
+            pprint(profile_matrix)
+            print "consensus_score=", consensus_score
 
         return consensus_score                 
 
