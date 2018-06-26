@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from pprint import pprint
 from argparse import ArgumentParser
 from collections import Counter
 
@@ -8,16 +9,21 @@ class MotifSearch(object):
     Searches for motifs using branch and bound method.
     """
 
-    def __init__(self, k):
+    def __init__(self, k, debug= False):
 
         self.offsets= []
         self.k= k
+        self.debug= debug
 
     def score(self, kmer, sequences):
         """
         sequences: 2 dimensional array of sequences
         """
-        
+  
+        if self.debug:
+            print
+            profiles= []
+
         # compute the consensus score for each slice
         # of the motif matrix
         consensus_score= 0
@@ -28,8 +34,17 @@ class MotifSearch(object):
             for x in range(len(kmer)):
                 y= kmer[x]
                 profile[sequences[x][y+i]]+= 1
-            
+
+                if self.debug:
+                    print kmer, i, x, y, sequences[x], sequences[x][y+i]
+
             consensus_score+= max(profile.values())
+            if self.debug:
+                profiles.append(profile)
+
+        if self.debug:
+            pprint(profiles) 
+            print "=", consensus_score
 
         return consensus_score                 
 
@@ -92,18 +107,24 @@ if __name__ == '__main__':
     parser.add_argument("--k", type= int, default= 8, help= "k-mer length")
     parser.add_argument("--start", type= int, default= 0, help= "starting sequence")
     parser.add_argument("--end", type= int, default= 3, help= "ending sequence")
+    parser.add_argument('--debug', dest= 'debug', action= 'store_true', default= False, help= "show debug trace")
+
 
     args= parser.parse_args()
+
+    debug= args.debug
+    if debug:
+        print "args", args.__dict__
 
     fh= open(args.input, "r")
     sequences= [line.replace('\n', '').upper() for line in fh.readlines()]
     fh.close()
     
-    motif_search= MotifSearch(args.k)
+    motif_search= MotifSearch(args.k, debug)
 
     # list the sequence, position and pattern of each motif we found
     for (sequence, position) in zip(range(args.start, args.end), motif_search(sequences[args.start:args.end])):
-
+             
          pattern= sequences[sequence][position:position + args.k]
 
          print "found motif", pattern, "at position", position, "in sequence", sequences[sequence]
