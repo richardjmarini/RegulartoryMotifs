@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from time import time
 from pprint import pprint
 from argparse import ArgumentParser
 from collections import Counter
@@ -14,6 +15,9 @@ class MotifSearch(object):
         self.offsets= []
         self.k= k
         self.debug= debug
+
+        self.iterations= 0
+        self.max_score= 0
 
     def score(self, kmer, sequences):
         """
@@ -51,6 +55,8 @@ class MotifSearch(object):
         return consensus_score                 
 
     def next(self, sequences, offsets, max_score):
+
+        self.iterations+= 1
     
         num_sequences= len(sequences)
         num_offsets= len(offsets)
@@ -94,6 +100,8 @@ class MotifSearch(object):
         # cycle through each k-mer starting position 
         for kmer in range(len(sequences[0]) - (self.k + 1)):
             max_score= self.next(sequences, [kmer], max_score)
+
+        self.max_score= max_score
     
         return self.offsets
 
@@ -113,7 +121,7 @@ if __name__ == '__main__':
 
 
     args= parser.parse_args()
-
+    print args
     debug= args.debug
     if debug:
         print "args", args.__dict__
@@ -124,10 +132,14 @@ if __name__ == '__main__':
     
     motif_search= MotifSearch(args.k, debug)
 
+    start_time= time()
     # list the sequence, position and pattern of each motif we found
     for (sequence, position) in zip(range(args.start, args.end), motif_search(sequences[args.start:args.end])):
              
          pattern= sequences[sequence][position:position + args.k]
 
          print "found motif", pattern, "at position", position, "in sequence", sequences[sequence]
+    end_time= time()
 
+    print "max score", motif_search.max_score, "in", motif_search.iterations, "iterations", "in", end_time - start_time, "seconds"
+    
